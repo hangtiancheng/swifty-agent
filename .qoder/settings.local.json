@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/hangtiancheng/github/swifty-cli/apps/swifty-agent -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.json\" -o -name \"*.md\" \\\\\\) -not -path \"*/node_modules/*\" -not -path \"*/.next/*\" | head -100)",
+      "Bash(ls -la /Users/hangtiancheng/github/swifty-cli/apps/swifty-agent | head -40; echo \"--- rules files ---\"; ls /Users/hangtiancheng/github/swifty-cli/apps/swifty-agent/*.rules.yml 2>/dev/null || echo \"no rules file in app dir\")"
+    ]
+  }
+}
