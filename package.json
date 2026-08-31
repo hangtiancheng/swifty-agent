@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
-    "shadcn": "shadcn add --all --yes"
+    "shadcn": "shadcn add --all --yes",
+    "git:commit": "git add -A && git commit -m \"feat: Introduce new features\"",
+    "git:push": "pnpm git:commit && git push origin main"
   },
   "dependencies": {
     "@a2a-js/sdk": "^1.0.1",
