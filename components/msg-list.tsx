@@ -24,7 +24,7 @@
 import { memo, useEffect, useRef } from "react";
 import type { ChatMessage } from "@/hooks/use-chat";
 import type { A2uiClientAction } from "@a2ui/web_core/v0_9";
-import { A2uiView } from "@swifty.js/a2ui-shadcn";
+import { A2uiView } from "@/components/a2ui-view";
 import MdRender from "./md-render";
 import { LoaderCircle, Sparkles } from "lucide-react";
 

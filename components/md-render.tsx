@@ -43,7 +43,7 @@ export default function MdRender({
     <Streamdown
       mode={streaming ? "streaming" : "static"}
       isAnimating={streaming}
-      caret="block"
+      caret="circle"
       plugins={{ code }}
       shikiTheme={["github-light", "github-light"]}
       className={

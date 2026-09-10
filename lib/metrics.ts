@@ -12,7 +12,7 @@ import {
   Registry,
   type GaugeConfiguration,
 } from "prom-client";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const reportItemSchema = z.looseObject({
   type: z.string(),

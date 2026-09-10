@@ -25,7 +25,7 @@ if (isBrowser() && !isInitialized()) {
     dsn: "/api/log",
     projectId: "swifty-agent",
     debug: true,
-    beforePushEventList: (eventList) =>
+    beforeSendBatch: (eventList) =>
       eventList.filter(
         (item) => JSON.stringify(item).length <= MAX_EVENT_BYTES,
       ),

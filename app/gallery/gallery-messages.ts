@@ -1,5 +1,5 @@
 import type { A2uiMessage } from "@a2ui/web_core/v0_9";
-import { SHADCN_CATALOG_ID } from "@swifty.js/a2ui-shadcn";
+import { SHADCN_CATALOG_ID } from "@/catalog";
 
 const SURFACE_ID = "gallery-surface";
 const CATALOG_ID = SHADCN_CATALOG_ID;
@@ -133,7 +133,12 @@ export function createGalleryMessages(): A2uiMessage[] {
       ratio: 4,
       child: "g-aspect-img",
     },
-    { id: "g-aspect-img", component: "Image", url: "/hero.svg", fit: "cover" },
+    {
+      id: "g-aspect-img",
+      component: "Image",
+      url: "/favicon.svg",
+      fit: "cover",
+    },
     {
       id: "g-scroll",
       component: "ScrollArea",
