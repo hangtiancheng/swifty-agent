@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(find /Users/hangtiancheng/github/a2ui/packages/shadcn -type f | head -100)"
-    ]
-  }
-}
