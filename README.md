@@ -1,6 +1,20 @@
+<div align="center">
+
 # Swifty Agent
 
-AI intelligent OnCall assistant
+**An AI OnCall assistant — RAG chat, interactive A2UI surfaces, and a plan-execute-replan AI Ops pipeline for alert analysis, all with first-party Prometheus monitoring.**
+
+Built on Next.js 16 + AI SDK, with Redis Stack for vector search and `@swifty.js/a2ui-shadcn` for LLM-generated UI.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Stack-DC382D?logo=redis&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-monitoring-E6522C?logo=prometheus&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-f5a623.svg)
+
+</div>
+
+---
 
 ## setup
 
