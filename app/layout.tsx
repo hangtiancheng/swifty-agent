@@ -26,6 +26,7 @@ import { Swifty } from "@swifty.js/fonts";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { SentryProvider } from "@/components/sentry-provider";
+import { Toaster } from "@/components/ui/toast";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -58,7 +59,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <SentryProvider>{children}</SentryProvider>
+        <SentryProvider>
+          {children}
+          <Toaster />
+        </SentryProvider>
       </body>
     </html>
   );

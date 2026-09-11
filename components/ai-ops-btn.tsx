@@ -26,7 +26,11 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { motion } from "motion/react";
 import { Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
 interface AIOpsButtonProps {
   onClick: () => void;
   disabled: boolean;
@@ -109,24 +113,43 @@ export default function AIOpsBtn({ onClick, disabled }: AIOpsButtonProps) {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerEnd}
-      onPointerCancel={handlePointerEnd}
-      // aria-disabled instead of disabled: a natively disabled button swallows
-      // pointer events, which would make it undraggable while streaming.
-      aria-disabled={disabled}
+    // The wrapper owns position so motion transforms (hover/tap scale) never
+    // fight the Tailwind centering translate.
+    <div
+      className={cn(
+        "z-10 select-none",
+        pos ? "fixed" : "absolute top-4 left-1/2 -translate-x-1/2",
+      )}
       style={pos ? { left: pos.x, top: pos.y } : undefined}
-      className={`${
-        pos ? "fixed" : "absolute top-4 left-1/2 -translate-x-1/2"
-      } z-10 flex cursor-grab touch-none items-center gap-2 rounded-full bg-green-500 px-4 py-2 text-sm font-medium text-white shadow-md transition select-none active:cursor-grabbing ${
-        disabled ? "opacity-50" : "hover:bg-green-600"
-      }`}
     >
-      <Layers className="h-4 w-4" />
-      <span>AI Ops</span>
-    </button>
+      <Button
+        size="lg"
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+        // aria-disabled instead of disabled: a natively disabled button swallows
+        // pointer events, which would make it undraggable while streaming.
+        aria-disabled={disabled}
+        render={
+          <motion.button
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{
+              y: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
+              opacity: { duration: 0.25, ease: "easeOut" },
+            }}
+            className="cursor-grab touch-none active:cursor-grabbing"
+          />
+        }
+        className={cn("rounded-full px-4 shadow-lg", disabled && "opacity-50")}
+      >
+        <Layers data-icon="inline-start" />
+        <span>AI Ops</span>
+      </Button>
+    </div>
   );
 }

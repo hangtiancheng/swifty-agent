@@ -23,22 +23,17 @@
 "use client";
 
 import { useCallback } from "react";
+import { useChat, type ChatMessage } from "@/hooks/use-chat";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import {
-  useChat,
-  type ChatMessage,
-  type NotificationType,
-} from "@/hooks/use-chat";
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import Sidebar from "@/components/sidebar";
 import ChatContainer from "@/components/chat-container";
 import AIOpsBtn from "@/components/ai-ops-btn";
 import LoadingOverlay from "@/components/loading-overlay";
-
-const NOTIFY_COLORS: Record<NotificationType, string> = {
-  info: "bg-sky-500",
-  success: "bg-green-500",
-  warning: "bg-amber-500",
-  error: "bg-red-500",
-};
 
 export default function Home() {
   // P1-6 fix: destructure individual fields so useCallback dependencies can
@@ -51,7 +46,6 @@ export default function Home() {
     mode,
     setMode,
     histories,
-    notification,
     overlay,
     showNotification,
     newChat,
@@ -94,36 +88,34 @@ export default function Home() {
   );
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-white text-zinc-900">
-      <Sidebar
-        histories={histories}
-        activeId={sessionId}
-        onNewChat={newChat}
-        onLoad={loadChatHistory}
-        onDelete={deleteChatHistory}
-      />
-      <main className="relative flex flex-1 flex-col overflow-hidden bg-white">
-        <AIOpsBtn onClick={handleAIOps} disabled={isStreaming} />
-        <ChatContainer
-          messages={messages}
-          isStreaming={isStreaming}
-          mode={mode}
-          onModeChange={setMode}
-          onSend={sendMessage}
-          onA2uiAction={sendA2uiAction}
-          onUpload={handleUpload}
-        />
-      </main>
+    <SidebarProvider className="h-svh overflow-hidden">
+      <ResizablePanelGroup orientation="horizontal" className="h-full">
+        <ResizablePanel defaultSize={220} minSize={160} maxSize={420}>
+          <Sidebar
+            histories={histories}
+            activeId={sessionId}
+            onNewChat={newChat}
+            onLoad={loadChatHistory}
+            onDelete={deleteChatHistory}
+          />
+        </ResizablePanel>
+        <ResizableHandle className="hover:bg-primary/40 active:bg-primary/60" />
+        <ResizablePanel minSize={360}>
+          <main className="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+            <AIOpsBtn onClick={handleAIOps} disabled={isStreaming} />
+            <ChatContainer
+              messages={messages}
+              isStreaming={isStreaming}
+              mode={mode}
+              onModeChange={setMode}
+              onSend={sendMessage}
+              onA2uiAction={sendA2uiAction}
+              onUpload={handleUpload}
+            />
+          </main>
+        </ResizablePanel>
+      </ResizablePanelGroup>
       <LoadingOverlay overlay={overlay} />
-      {notification && (
-        <div
-          className={`fixed top-5 right-5 z-10000 max-w-xs rounded-lg p-4 text-sm font-medium text-white shadow-lg ${
-            NOTIFY_COLORS[notification.type]
-          }`}
-        >
-          {notification.message}
-        </div>
-      )}
-    </div>
+    </SidebarProvider>
   );
 }

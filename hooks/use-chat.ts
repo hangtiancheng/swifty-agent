@@ -30,6 +30,7 @@ import {
   aiOpsResponseSchema,
   uploadResponseSchema,
 } from "@/lib/schemas";
+import { toast } from "@/components/ui/toast";
 
 export type Mode = "quick" | "stream";
 
@@ -145,27 +146,17 @@ export function useChat() {
     return () => streamController.abort();
   }, [streamController]);
 
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: NotificationType;
-  } | null>(null);
   const [overlay, setOverlay] = useState<OverlayState>({
     show: false,
     text: "",
     subtext: "",
   });
 
-  // P2-9 fix: auto-dismiss notifications after 3s. The timer is created and
-  // cleaned up inside the effect (no ref), so unmount naturally clears it.
-  useEffect(() => {
-    if (!notification) return;
-    const timer = setTimeout(() => setNotification(null), 3000);
-    return () => clearTimeout(timer);
-  }, [notification]);
-
+  // Notifications render through the base-ui toast system; keep the same
+  // (message, type) call signature so call sites stay untouched.
   const showNotification = useCallback(
     (message: string, type: NotificationType = "info") => {
-      setNotification({ message, type });
+      toast.add({ title: message, type, timeout: 3000 });
     },
     [],
   );
@@ -572,7 +563,6 @@ export function useChat() {
       messages,
       addMessage,
       histories,
-      notification,
       overlay,
       showNotification,
       newChat,
@@ -590,7 +580,6 @@ export function useChat() {
       messages,
       addMessage,
       histories,
-      notification,
       overlay,
       showNotification,
       newChat,

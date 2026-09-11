@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { renderMarkdown } from "@a2ui/markdown-it";
 import {
   A2uiSurface,
@@ -102,7 +103,18 @@ export function A2uiView({ messages, onAction, onRawAction }: A2uiViewProps) {
     <MarkdownContext.Provider value={renderMarkdown}>
       <div className="mt-3 flex flex-col gap-3">
         {surfaces.map((surface) => (
-          <A2uiSurface key={surface.id} surface={surface} />
+          <motion.div
+            key={surface.id}
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              y: { type: "spring", visualDuration: 0.4, bounce: 0.18 },
+              scale: { type: "spring", visualDuration: 0.4, bounce: 0.18 },
+              opacity: { duration: 0.25, ease: "easeOut" },
+            }}
+          >
+            <A2uiSurface surface={surface} />
+          </motion.div>
         ))}
       </div>
     </MarkdownContext.Provider>

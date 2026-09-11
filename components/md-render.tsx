@@ -48,7 +48,7 @@ export default function MdRender({
       shikiTheme={["github-light", "github-light"]}
       className={
         className ??
-        "max-w-none text-sm leading-relaxed wrap-break-word text-zinc-800"
+        "text-foreground max-w-none text-sm leading-relaxed wrap-break-word"
       }
     >
       {content}

@@ -21,8 +21,16 @@
  */
 
 "use client";
+import { motion } from "motion/react";
+import { BotMessageSquare } from "lucide-react";
 import type { ChatMessage, Mode } from "@/hooks/use-chat";
 import type { A2uiClientAction } from "@a2ui/web_core/v0_9";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import MessageList from "./msg-list";
 import ChatInput from "./chat-input";
 
@@ -53,16 +61,26 @@ export default function ChatContainer({
       }`}
     >
       {centered ? (
-        <div className="px-6 text-center text-sky-600">
-          <p className="text-2xl">
-            Hello! I am the Swifty Agent OnCall assistant
-          </p>
-          <p className="mt-3 text-sm text-zinc-500">
-            If this is your first time, upload a file from the docs directory
-            via the &quot;...&quot; menu before chatting, otherwise you may get
-            a search error.
-          </p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            y: { type: "spring", visualDuration: 0.5, bounce: 0.2 },
+            opacity: { duration: 0.3, ease: "easeOut" },
+          }}
+          className="w-full max-w-xl px-6"
+        >
+          <Empty className="border">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-accent text-primary">
+                <BotMessageSquare />
+              </EmptyMedia>
+              <EmptyTitle className="text-xl">
+                Hello! I am the Swifty Agent OnCall assistant
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
+        </motion.div>
       ) : (
         <MessageList
           messages={messages}
@@ -70,7 +88,15 @@ export default function ChatContainer({
           onA2uiAction={onA2uiAction}
         />
       )}
-      <div className="w-full px-6 pb-5">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          y: { type: "spring", visualDuration: 0.5, bounce: 0.15 },
+          opacity: { duration: 0.3, ease: "easeOut" },
+        }}
+        className="w-full px-6 pb-5"
+      >
         <ChatInput
           isStreaming={isStreaming}
           mode={mode}
@@ -78,7 +104,7 @@ export default function ChatContainer({
           onSend={onSend}
           onUpload={onUpload}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }

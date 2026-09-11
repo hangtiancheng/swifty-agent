@@ -21,9 +21,23 @@
  */
 
 "use client";
-import { useState, useRef, useEffect } from "react";
-import { MoreHorizontal, Paperclip, ChevronDown, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { MoreHorizontal, Paperclip, Send } from "lucide-react";
 import type { Mode } from "@/hooks/use-chat";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ChatInputProps {
   isStreaming: boolean;
@@ -33,8 +47,6 @@ interface ChatInputProps {
   onUpload: (file: File) => void;
 }
 
-const MODES: Mode[] = ["quick", "stream"];
-
 export default function ChatInput({
   isStreaming,
   mode,
@@ -43,45 +55,17 @@ export default function ChatInput({
   onUpload,
 }: ChatInputProps) {
   const [text, setText] = useState("");
-  const [showTools, setShowTools] = useState(false);
-  const [showMode, setShowMode] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // P3-9 fix: auto-resize textarea to fit content (up to ~10 lines).
+  // P3-9 fix: auto-resize textarea to fit content (up to ~10 lines). Kept on
+  // purpose — field-sizing-content is not shipped in every browser yet.
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [text]);
-
-  // P2-6 fix: close dropdowns on outside click or Escape key.
-  useEffect(() => {
-    if (!showTools && !showMode) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setShowTools(false);
-        setShowMode(false);
-      }
-    };
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setShowTools(false);
-        setShowMode(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [showTools, showMode]);
 
   const send = () => {
     const t = text.trim();
@@ -91,11 +75,8 @@ export default function ChatInput({
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative rounded-3xl border border-zinc-200 bg-white p-3 shadow-sm"
-    >
-      <textarea
+    <InputGroup className="bg-card rounded-3xl p-2 shadow-sm">
+      <InputGroupTextarea
         ref={textareaRef}
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -107,76 +88,55 @@ export default function ChatInput({
         }}
         disabled={isStreaming}
         placeholder="Ask the Swifty Agent OnCall assistant"
-        className="max-h-40 w-full resize-none bg-transparent text-base text-zinc-900 outline-none placeholder:text-zinc-400"
+        className="max-h-40 min-h-0 px-2"
         rows={1}
       />
-      <div className="mt-2 flex items-center justify-between">
-        <div className="relative">
-          <button
-            onClick={() => setShowTools((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100"
-            aria-label="Tools"
-            aria-expanded={showTools}
-          >
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
-          {showTools && (
-            <div className="absolute bottom-full left-0 mb-2 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
-              <button
-                onClick={() => {
-                  fileRef.current?.click();
-                  setShowTools(false);
-                }}
-                className="flex w-48 items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-800 hover:bg-zinc-100"
+      <InputGroupAddon align="block-end" className="justify-between pt-1.5">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <InputGroupButton
+                size="icon-sm"
+                variant="ghost"
+                aria-label="Tools"
               >
-                <Paperclip className="h-5 w-5" />
-                <span>Upload file</span>
-              </button>
-            </div>
-          )}
-        </div>
+                <MoreHorizontal />
+              </InputGroupButton>
+            }
+          />
+          <DropdownMenuContent side="top" align="start" className="w-44">
+            <DropdownMenuItem onClick={() => fileRef.current?.click()}>
+              <Paperclip />
+              Upload file
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <button
-              onClick={() => setShowMode((v) => !v)}
-              className="flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-800"
-              aria-expanded={showMode}
-              aria-label="Chat mode"
-            >
-              <span>{mode === "quick" ? "Quick" : "Stream"}</span>
-              <ChevronDown className="h-4 w-4" />
-            </button>
-            {showMode && (
-              <div className="absolute right-0 bottom-full mb-2 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
-                {MODES.map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => {
-                      onModeChange(m);
-                      setShowMode(false);
-                    }}
-                    className={`block w-40 rounded-lg px-3 py-2 text-left text-sm ${
-                      m === mode
-                        ? "bg-sky-50 text-sky-600"
-                        : "text-zinc-800 hover:bg-zinc-100"
-                    }`}
-                  >
-                    {m === "quick" ? "Quick" : "Stream"}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <button
+          <ToggleGroup
+            variant="outline"
+            size="sm"
+            spacing={0}
+            value={[mode]}
+            onValueChange={(v) => {
+              const next = v.at(-1);
+              if (next === "quick" || next === "stream") onModeChange(next);
+            }}
+            aria-label="Chat mode"
+          >
+            <ToggleGroupItem value="quick">Quick</ToggleGroupItem>
+            <ToggleGroupItem value="stream">Stream</ToggleGroupItem>
+          </ToggleGroup>
+          <InputGroupButton
+            size="icon-sm"
+            variant="default"
             onClick={send}
             disabled={isStreaming || !text.trim()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-zinc-100"
             aria-label="Send"
           >
-            <Send className="h-5 w-5" />
-          </button>
+            {isStreaming ? <Spinner /> : <Send />}
+          </InputGroupButton>
         </div>
-      </div>
+      </InputGroupAddon>
       <input
         ref={fileRef}
         type="file"
@@ -188,6 +148,6 @@ export default function ChatInput({
           e.target.value = "";
         }}
       />
-    </div>
+    </InputGroup>
   );
 }

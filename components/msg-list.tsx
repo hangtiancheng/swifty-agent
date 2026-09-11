@@ -21,12 +21,36 @@
  */
 
 "use client";
-import { memo, useEffect, useRef } from "react";
+import { memo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import type { ChatMessage } from "@/hooks/use-chat";
 import type { A2uiClientAction } from "@a2ui/web_core/v0_9";
 import { A2uiView } from "@/components/a2ui-view";
 import MdRender from "./md-render";
-import { LoaderCircle, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@/components/ui/message-scroller";
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+} from "@/components/ui/message";
+import { Bubble, BubbleContent } from "@/components/ui/bubble";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 
 interface MessageListProps {
   messages: ChatMessage[];
@@ -40,25 +64,103 @@ export default function MessageList({
   isStreaming,
   onA2uiAction,
 }: MessageListProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
-  }, [messages]);
-
   return (
-    <div ref={ref} className="flex-1 overflow-y-auto px-6 py-4">
-      {messages.map((m, i) => (
-        <MessageItem
-          key={i}
-          message={m}
-          index={i}
-          streaming={
-            isStreaming && i === messages.length - 1 && m.type === "assistant"
-          }
-          onA2uiAction={onA2uiAction}
-        />
-      ))}
-    </div>
+    <MessageScrollerProvider autoScroll>
+      <MessageScroller className="min-h-0 flex-1">
+        <MessageScrollerViewport>
+          <MessageScrollerContent className="px-6 py-4">
+            {messages.map((m, i) => (
+              <MessageScrollerItem
+                key={i}
+                scrollAnchor={i === messages.length - 1}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    y: { type: "spring", visualDuration: 0.4, bounce: 0.18 },
+                    opacity: { duration: 0.25, ease: "easeOut" },
+                  }}
+                >
+                  <MessageItem
+                    message={m}
+                    index={i}
+                    streaming={
+                      isStreaming &&
+                      i === messages.length - 1 &&
+                      m.type === "assistant"
+                    }
+                    onA2uiAction={onA2uiAction}
+                  />
+                </motion.div>
+              </MessageScrollerItem>
+            ))}
+          </MessageScrollerContent>
+        </MessageScrollerViewport>
+        <MessageScrollerButton />
+      </MessageScroller>
+    </MessageScrollerProvider>
+  );
+}
+
+function DetailSteps({ detail }: { detail: string[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-muted-foreground rounded-full"
+          >
+            <ChevronDown
+              data-icon="inline-start"
+              className={cn(
+                "transition-transform duration-300",
+                open && "rotate-180",
+              )}
+            />
+            View details ({detail.length} steps)
+          </Button>
+        }
+      />
+      <AnimatePresence initial={false}>
+        {open && (
+          <CollapsibleContent
+            render={
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{
+                  height: { duration: 0.32, ease: [0.23, 1, 0.32, 1] },
+                  opacity: { duration: 0.2, ease: "easeOut" },
+                }}
+                className="overflow-hidden"
+              />
+            }
+          >
+            <div className="flex flex-col gap-2 pt-2">
+              {detail.map((d, idx) => (
+                <div
+                  key={idx}
+                  className="bg-card border-primary/40 flex items-start gap-2 rounded-lg border-l-2 py-2 pr-3 pl-3 text-xs"
+                >
+                  <Badge variant="outline" className="mt-px shrink-0">
+                    Step {idx + 1}
+                  </Badge>
+                  <MdRender
+                    content={d}
+                    className="text-muted-foreground max-w-none min-w-0 flex-1 text-xs leading-relaxed wrap-break-word"
+                  />
+                </div>
+              ))}
+            </div>
+          </CollapsibleContent>
+        )}
+      </AnimatePresence>
+    </Collapsible>
   );
 }
 
@@ -77,57 +179,39 @@ const MessageItem = memo(function MessageItem({
 }) {
   if (message.type === "user") {
     return (
-      <div className="mb-6 flex flex-col items-end">
-        <div className="max-w-[70%] rounded-2xl rounded-br-sm bg-zinc-100 px-4 py-3 text-sm whitespace-pre-wrap text-zinc-800">
-          {message.content}
-        </div>
-      </div>
+      <Message align="end">
+        <Bubble align="end" variant="secondary" className="max-w-[75%]">
+          <BubbleContent className="rounded-2xl rounded-br-sm whitespace-pre-wrap">
+            {message.content}
+          </BubbleContent>
+        </Bubble>
+      </Message>
     );
   }
   return (
-    <div className="mb-6 flex items-start gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-green-500">
-        <Sparkles className="h-5 w-5 text-white" />
-      </div>
-      <div className="min-w-0 flex-1">
+    <Message>
+      <MessageAvatar className="from-primary to-chart-4 text-primary-foreground size-8 self-start bg-linear-to-br">
+        <Sparkles className="size-4" />
+      </MessageAvatar>
+      <MessageContent>
         {message.detail && message.detail.length > 0 && (
-          <details className="mb-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm">
-            <summary className="cursor-pointer font-medium text-sky-600">
-              View details ({message.detail.length} steps)
-            </summary>
-            <div className="mt-2 flex flex-col gap-2">
-              {message.detail.map((d, idx) => (
-                <div
-                  key={idx}
-                  className="border-l-2 border-sky-400 bg-white p-2 text-xs text-zinc-700"
-                >
-                  <strong className="text-sky-600">Step {idx + 1}:</strong>
-                  <MdRender
-                    content={d}
-                    className="max-w-none text-xs leading-relaxed wrap-break-word text-zinc-700"
-                  />
-                </div>
-              ))}
-            </div>
-          </details>
+          <DetailSteps detail={message.detail} />
         )}
-        <div className="text-sm text-zinc-800">
-          {message.pending ? (
-            <div className="flex items-center gap-2 py-1 text-zinc-400">
-              <LoaderCircle className="h-4 w-4 animate-spin" />
-              <span>Thinking...</span>
-            </div>
-          ) : (
-            <MdRender content={message.content} streaming={streaming} />
-          )}
-          {message.a2ui && message.a2ui.length > 0 && (
-            <A2uiView
-              messages={message.a2ui}
-              onRawAction={(action) => onA2uiAction(index, action)}
-            />
-          )}
-        </div>
-      </div>
-    </div>
+        {message.pending ? (
+          <div className="text-muted-foreground flex items-center gap-2 py-1">
+            <Spinner />
+            <span className="text-sm">Thinking...</span>
+          </div>
+        ) : (
+          <MdRender content={message.content} streaming={streaming} />
+        )}
+        {message.a2ui && message.a2ui.length > 0 && (
+          <A2uiView
+            messages={message.a2ui}
+            onRawAction={(action) => onA2uiAction(index, action)}
+          />
+        )}
+      </MessageContent>
+    </Message>
   );
 });
