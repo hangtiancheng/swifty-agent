@@ -17,7 +17,7 @@ AI intelligent OnCall assistant.
 - Next.js 16 App Router + React 19 + TypeScript
 - Vercel AI SDK v7 (`ai`): streamText / generateText (structured output via `output: Output.object({schema})`, result on `.output` — `generateObject` is deprecated) / tool / embed / embedMany
 - LLM: OpenAI (OpenAI compatible) via `@ai-sdk/openai` createOpenAI
-- Embedding: Alibaba DashScope text-embedding-v4 / Ollama nomic-embed-text via `@ai-sdk/openai-compatible`; selected by `EMBEDDING_PROVIDER` ("openai" | "ollama"); batch requests capped at 10 inputs
+- Embedding: text-embedding-v4 via `@ai-sdk/openai-compatible`; selected by `EMBEDDING_PROVIDER` ("openai" only); batch requests capped at 10 inputs
 - Vector DB: Redis Stack (`redis`, index=idx:biz, key prefix=biz:, VECTOR FLOAT32 + HNSW + COSINE); index dim is probed from the embedding provider at startup and the index is auto-recreated on dim mismatch
 - MySQL: `knex` + `mysql2` (mysql_crud tool uses knex.raw for dynamic SQL)
 - MCP: `@modelcontextprotocol/sdk` (SSE log tools)

@@ -61,18 +61,13 @@ export const config = {
       10,
     ),
   },
-  // Alibaba Bailian OpenAI embedding (OpenAI compatible)
+  // OpenAI embedding (OpenAI compatible)
   openaiEmbedding: {
     model: process.env.OPENAI_EMBEDDING_MODEL ?? "text-embedding-v4",
     apiKey: process.env.OPENAI_EMBEDDING_API_KEY ?? "",
     baseURL:
       process.env.OPENAI_EMBEDDING_BASE_URL ??
       "https://openai.aliyuncs.com/compatible-mode/v1",
-  },
-  // Ollama local embedding (OpenAI compatible endpoint, v0.1.24+)
-  ollama: {
-    model: process.env.OLLAMA_EMBEDDING_MODEL ?? "nomic-embed-text",
-    baseURL: process.env.OLLAMA_BASE_URL ?? "http://localhost:11434",
   },
   // Redis Stack (RediSearch module) — vector database
   redis: {
@@ -88,9 +83,8 @@ export const config = {
   prometheusBaseUrl: process.env.PROMETHEUS_BASE_URL ?? "http://127.0.0.1:9090",
   // LLM provider selection: "openai" (default) | "anthropic"
   provider: (process.env.LLM_PROVIDER ?? "openai") as "openai" | "anthropic",
-  // Embedding provider selection: "openai" (default) | "ollama"
-  embeddingProvider: (process.env.EMBEDDING_PROVIDER ?? "openai") as
-    "openai" | "ollama",
+  // Embedding provider selection: "openai" (only)
+  embeddingProvider: (process.env.EMBEDDING_PROVIDER ?? "openai") as "openai",
 } as const;
 
 // Conversation memory window size.

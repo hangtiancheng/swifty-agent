@@ -21,24 +21,13 @@
  */
 
 // Embedding via @ai-sdk/openai-compatible; provider selected by EMBEDDING_PROVIDER:
-//   "openai" (default, text-embedding-v4) | "ollama" (local, nomic-embed-text)
+//   "openai" (default, text-embedding-v4)
 import { embed, embedMany, type EmbeddingModel } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { config } from "@/lib/config";
 
 // Provider factory — symmetric with resolveThinkModel/resolveQuickModel in models.ts
 function createEmbeddingProvider(): EmbeddingModel {
-  if (config.embeddingProvider === "ollama") {
-    // Ollama exposes an OpenAI-compatible /v1/embeddings endpoint (v0.1.24+).
-    // No API key is required, but the adapter demands a non-empty string.
-    const ollama = createOpenAICompatible({
-      name: "ollama",
-      baseURL: `${config.ollama.baseURL}/v1`,
-      apiKey: "ollama",
-    });
-    return ollama.embeddingModel(config.ollama.model);
-  }
-
   // Default: openai (text-embedding-v4, OpenAI compatible)
   const openai = createOpenAICompatible({
     name: "openai",
@@ -57,8 +46,7 @@ export async function embedText(text: string): Promise<number[]> {
 }
 
 // Batch get embeddings.
-// OpenAI-compatible endpoints cap inputs per request (DashScope
-// text-embedding-v4 allows 10), while the SDK default is 2048 per call —
+// OpenAI-compatible endpoints cap inputs per request (text-embedding-v4 allows 10), while the SDK default is 2048 per call —
 // large documents would fail with "batch size is invalid" without splitting.
 const EMBED_BATCH_SIZE = 10;
 

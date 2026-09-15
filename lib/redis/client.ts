@@ -64,7 +64,6 @@ async function initClient(): Promise<RedisClientType> {
 // model output is authoritative (e.g. a model returning 1024 floats while
 // config assumed 2048 made every HSET silently fail RediSearch indexing —
 // num_docs stayed 0 with hash_indexing_failures climbing). Also covers
-// provider switches (openai ↔ ollama): stored dim ≠ probed dim → recreate.
 async function ensureIndex(client: RedisClientType): Promise<void> {
   const dim = (await embedText("dimension probe")).length;
 
